@@ -1,5 +1,14 @@
 const WHATSAPP_NUMBER = "526645812107";
 
+const CATEGORY_IMAGES = {
+  "Café": "./assets/menu/cafe.jpg",
+  "Pan": "./assets/menu/pan.jpg",
+  "Licuados": "./assets/menu/licuados.jpg",
+  "Mariscos": "./assets/menu/mariscos.jpg",
+  "Desayunos": "./assets/menu/desayunos.jpg",
+  "Bebidas": "./assets/menu/bebidas.jpg"
+};
+
 let products = [];
 let cart = JSON.parse(localStorage.getItem("cataleya-cart") || "[]");
 let activeCategory = "Todos";
@@ -73,8 +82,9 @@ function renderCategories() {
 }
 
 function productVisual(product) {
-  if (product.image) {
-    return `<img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}" loading="lazy" />`;
+  const image = product.image || CATEGORY_IMAGES[product.category];
+  if (image) {
+    return `<img src="${escapeHtml(image)}" alt="" role="presentation" loading="lazy" />`;
   }
   return `<span>${escapeHtml(product.emoji || "🍽️")}</span>`;
 }
