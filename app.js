@@ -1,5 +1,4 @@
-// Agrega el número de Cataleya con código de país, sin espacios ni signos.
-const WHATSAPP_NUMBER = "";
+const WHATSAPP_NUMBER = "526645812107";
 
 let products = [];
 let cart = JSON.parse(localStorage.getItem("cataleya-cart") || "[]");
