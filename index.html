@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#d27929" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta
+      name="description"
+      content="Menú digital de Cataleya Restaurante. Café, pan, licuados, mariscos, desayunos y bebidas."
+    />
+    <title>Cataleya Restaurante | Menú</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,700;9..144,900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="announcement">
+      <span class="status-dot"></span>
+      ¡Estamos abiertos! El antojo no tiene horario.
+    </div>
+
+    <header class="hero">
+      <nav class="topbar shell" aria-label="Navegación principal">
+        <a class="brand" href="#inicio" aria-label="Cataleya Restaurante, ir al inicio">
+          <img
+            class="brand-logo"
+            src="./assets/logo-cataleya.jpg"
+            alt="Cataleya Restaurante"
+            width="120"
+            height="120"
+          />
+        </a>
+        <button class="cart-button" id="open-cart" type="button" aria-label="Abrir pedido">
+          <span>Mi pedido</span>
+          <b id="cart-count">0</b>
+        </button>
+      </nav>
+
+      <section class="hero-content shell" id="inicio">
+        <div class="hero-copy">
+          <p class="eyebrow">Sabores frescos · momentos especiales</p>
+          <h1>Tu lugar para <span>disfrutar</span> cada antojo.</h1>
+          <p class="hero-text">
+            Café recién hecho, pan dulce, desayunos y mariscos preparados al momento para compartir.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#menu">Ver el menú</a>
+            <a class="button secondary" href="#menu">Explorar categorías</a>
+          </div>
+          <div class="service-chips">
+            <span>🛵 A domicilio</span>
+            <span>🛍️ Para recoger</span>
+            <span>🕘 Consulta nuestro horario</span>
+          </div>
+        </div>
+
+        <div class="hero-art" aria-label="Selección de especialidades Cataleya">
+          <div class="sun"></div>
+          <div class="plate">
+            <span class="food food-one">☕</span>
+            <span class="food food-two">🥐</span>
+            <span class="food food-three">🦐</span>
+          </div>
+          <span class="decor flower-one">✿</span>
+          <span class="decor flower-two">✦</span>
+          <div class="sazon-card">
+            <b>Hecho al momento</b>
+            <span>con ingredientes frescos</span>
+          </div>
+        </div>
+      </section>
+    </header>
+
+    <main>
+      <section class="menu-section shell" id="menu">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">¿Qué se te antoja hoy?</p>
+            <h2>Nuestro menú</h2>
+          </div>
+          <label class="search">
+            <span>⌕</span>
+            <input id="search-input" type="search" placeholder="Buscar platillo…" />
+          </label>
+        </div>
+
+        <div class="categories" id="categories" aria-label="Categorías del menú"></div>
+        <div class="product-grid" id="product-grid"></div>
+        <p class="empty-results" id="empty-results" hidden>
+          No encontramos ese antojo. Prueba con otra búsqueda.
+        </p>
+      </section>
+
+      <section class="promise">
+        <div class="shell promise-grid">
+          <div>
+            <p class="eyebrow light">Nuestra promesa</p>
+            <h2>Un rincón para saborear y compartir.</h2>
+          </div>
+          <div class="promise-items">
+            <article><span>01</span><b>Ingredientes frescos</b><p>Seleccionados cada mañana.</p></article>
+            <article><span>02</span><b>Variedad para todos</b><p>De un buen café a mariscos frescos.</p></article>
+            <article><span>03</span><b>Preparado al momento</b><p>Como debe servirse la buena comida.</p></article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="shell footer-grid">
+        <div>
+          <strong>Cataleya Restaurante</strong>
+          <p>Café, pan, licuados, mariscos, desayunos y bebidas.</p>
+        </div>
+        <div>
+          <b>Cataleya</b>
+          <p>Información de sucursal por confirmar</p>
+        </div>
+      </div>
+    </footer>
+
+    <button class="floating-cart" id="floating-cart" type="button" aria-label="Ver pedido">
+      <span>🛍️</span>
+      <span><b id="floating-count">0</b> productos</span>
+      <strong id="floating-total">$0.00</strong>
+    </button>
+
+    <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+    <aside class="cart-drawer" id="cart-drawer" aria-labelledby="cart-title" aria-hidden="true">
+      <div class="drawer-header">
+        <div>
+          <p class="eyebrow">Casi listo</p>
+          <h2 id="cart-title">Tu pedido</h2>
+        </div>
+        <button class="icon-button" id="close-cart" type="button" aria-label="Cerrar pedido">×</button>
+      </div>
+
+      <div class="cart-items" id="cart-items"></div>
+      <div class="cart-empty" id="cart-empty">
+        <span>🍽️</span>
+        <b>Tu pedido está vacío</b>
+        <p>Agrega uno de nuestros platillos para comenzar.</p>
+      </div>
+
+      <form class="order-form" id="order-form">
+        <h3>Datos para tu pedido</h3>
+        <label>
+          Nombre completo *
+          <input id="customer-name" required autocomplete="name" placeholder="¿A nombre de quién?" />
+        </label>
+
+        <fieldset>
+          <legend>Método de entrega *</legend>
+          <div class="choice-grid">
+            <label><input type="radio" name="delivery" value="A domicilio" checked /> A domicilio</label>
+            <label><input type="radio" name="delivery" value="Para recoger" /> Para recoger</label>
+          </div>
+        </fieldset>
+
+        <label id="address-field">
+          Dirección *
+          <textarea id="customer-address" rows="2" placeholder="Calle, número, colonia y referencias"></textarea>
+        </label>
+
+        <label>
+          Método de pago *
+          <select id="payment-method">
+            <option>Efectivo</option>
+            <option>Transferencia</option>
+            <option>Tarjeta al recibir</option>
+          </select>
+        </label>
+
+        <label id="cash-field">
+          ¿Con cuánto vas a pagar? <small>(Opcional)</small>
+          <input id="cash-amount" inputmode="decimal" placeholder="Ej. 200, 500" />
+        </label>
+
+        <label>
+          Notas especiales <small>(Opcional)</small>
+          <textarea id="order-notes" rows="2" placeholder="Sin cebolla, salsa aparte…"></textarea>
+        </label>
+
+        <div class="totals">
+          <span>Subtotal <b id="subtotal">$0.00</b></span>
+          <span class="grand-total">Total estimado <b id="grand-total">$0.00</b></span>
+        </div>
+
+        <button class="whatsapp-button" type="submit">
+          <span>WhatsApp</span>
+          Enviar pedido
+        </button>
+        <p class="form-hint">Se abrirá WhatsApp con el pedido listo para enviar.</p>
+      </form>
+    </aside>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="./catalog-backup.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

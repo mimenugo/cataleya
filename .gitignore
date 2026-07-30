@@ -1,0 +1,9 @@
+# Herramientas que deben permanecer únicamente en la computadora local
+admin.html
+admin.css
+admin.js
+tools/
+
+# Archivos temporales del sistema
+Thumbs.db
+.DS_Store
