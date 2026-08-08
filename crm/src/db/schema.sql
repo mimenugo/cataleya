@@ -97,7 +97,43 @@ CREATE TABLE IF NOT EXISTS order_items (
   price_at_purchase NUMERIC(10,2) NOT NULL
 );
 
+-- Configuración editable del negocio (no secretos: eso vive en variables de entorno).
+CREATE TABLE IF NOT EXISTS settings (
+  id SERIAL PRIMARY KEY,
+  location_id INTEGER NOT NULL REFERENCES locations(id) ON DELETE CASCADE,
+  setting_key TEXT NOT NULL,
+  setting_value TEXT,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (location_id, setting_key)
+);
+
+-- Fase 3: una conversación de WhatsApp por cliente (como funciona WhatsApp de verdad:
+-- un solo hilo continuo por contacto, no varios hilos paralelos).
+CREATE TABLE IF NOT EXISTS whatsapp_conversations (
+  id SERIAL PRIMARY KEY,
+  location_id INTEGER NOT NULL REFERENCES locations(id) ON DELETE CASCADE,
+  customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+  status TEXT NOT NULL DEFAULT 'abierta',
+  last_message_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (location_id, customer_id)
+);
+
+CREATE TABLE IF NOT EXISTS whatsapp_messages (
+  id SERIAL PRIMARY KEY,
+  conversation_id INTEGER NOT NULL REFERENCES whatsapp_conversations(id) ON DELETE CASCADE,
+  direction TEXT NOT NULL, -- 'entrante' | 'saliente'
+  message_type TEXT NOT NULL DEFAULT 'text',
+  content TEXT,
+  media_url TEXT,
+  sent_by_user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  wa_message_id TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 CREATE INDEX IF NOT EXISTS idx_customers_phone ON customers (location_id, phone_normalized);
 CREATE INDEX IF NOT EXISTS idx_orders_customer ON orders (customer_id);
 CREATE INDEX IF NOT EXISTS idx_orders_location_created ON orders (location_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_products_location ON products (location_id);
+CREATE INDEX IF NOT EXISTS idx_wa_conversations_location ON whatsapp_conversations (location_id, last_message_at DESC NULLS LAST);
+CREATE INDEX IF NOT EXISTS idx_wa_messages_conversation ON whatsapp_messages (conversation_id, created_at);

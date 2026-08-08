@@ -10,6 +10,8 @@ export default function ProtectedLayout({ children }) {
           <Link href="/">Hoy</Link>
           <Link href="/clientes">Clientes</Link>
           <Link href="/pedidos">Pedidos</Link>
+          <Link href="/conversaciones">Conversaciones</Link>
+          <Link href="/configuracion">Configuración</Link>
         </nav>
         <LogoutButton />
       </aside>

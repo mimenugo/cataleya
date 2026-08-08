@@ -2,6 +2,21 @@ import { withTransaction } from "../config/db.js";
 import { getDefaultLocation } from "../services/location.service.js";
 import { findOrCreateCustomer, registerCustomerOrder } from "../services/customer.service.js";
 import { createOrder, listOrders, updateOrderStatus } from "../services/order.service.js";
+import { getSettings } from "../services/settings.service.js";
+import { notifyCustomerByLocation } from "../services/conversation.service.js";
+
+async function notifyOrderReady(order, locationId) {
+  try {
+    const settings = await getSettings(locationId);
+    const template = settings.order_ready_message?.trim();
+    if (!template) return;
+
+    const content = template.replaceAll("{{numero}}", order.order_number);
+    await notifyCustomerByLocation({ locationId, customerId: order.customer_id, content });
+  } catch (error) {
+    console.error("No se pudo enviar la notificación de pedido listo:", error);
+  }
+}
 
 function validateBody(body) {
   const errors = [];
@@ -80,6 +95,11 @@ export async function updateOrderStatusHandler(req, res) {
       locationId: req.user.location_id,
       status: req.body.status
     });
+
+    if (order.status === "listo") {
+      notifyOrderReady(order, req.user.location_id);
+    }
+
     res.json({ order });
   } catch (error) {
     const status = error.status ?? 500;

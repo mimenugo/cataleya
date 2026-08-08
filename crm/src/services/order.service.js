@@ -123,7 +123,7 @@ export async function updateOrderStatus({ orderId, locationId, status }) {
 
   const result = await pool.query(
     `UPDATE orders SET status = $1 WHERE id = $2 AND location_id = $3
-     RETURNING id, order_number, status`,
+     RETURNING id, order_number, status, customer_id`,
     [status, orderId, locationId]
   );
 

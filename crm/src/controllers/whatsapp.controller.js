@@ -1,4 +1,6 @@
 import { env } from "../config/env.js";
+import { getDefaultLocation } from "../services/location.service.js";
+import { saveIncomingMessage } from "../services/conversation.service.js";
 
 // Verificación del webhook exigida por Meta al configurar la suscripción.
 export function verifyWebhookHandler(req, res) {
@@ -12,16 +14,31 @@ export function verifyWebhookHandler(req, res) {
   return res.sendStatus(403);
 }
 
-// Fase 1: solo recibe y confirma; el histórico de conversaciones llega en Fase 3.
-export function receiveWebhookHandler(req, res) {
+function extractContactName(value, phone) {
+  const contact = value.contacts?.find(entry => entry.wa_id === phone);
+  return contact?.profile?.name ?? null;
+}
+
+export async function receiveWebhookHandler(req, res) {
+  const location = await getDefaultLocation();
   const entries = req.body?.entry ?? [];
+
   for (const entry of entries) {
     for (const change of entry.changes ?? []) {
       const messages = change.value?.messages ?? [];
       for (const message of messages) {
-        console.log(`[whatsapp] Mensaje entrante de ${message.from}:`, message.text?.body ?? message.type);
+        const content = message.type === "text" ? message.text?.body : `[${message.type}]`;
+        await saveIncomingMessage({
+          locationId: location.id,
+          rawPhone: message.from,
+          contactName: extractContactName(change.value, message.from),
+          content,
+          messageType: message.type,
+          waMessageId: message.id
+        });
       }
     }
   }
+
   res.sendStatus(200);
 }

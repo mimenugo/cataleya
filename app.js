@@ -1,5 +1,5 @@
 const WHATSAPP_NUMBER = "526645812107";
-const CRM_API_URL = "http://localhost:4000";
+const CRM_API_URL = "https://cataleya-production.up.railway.app";
 
 const CATEGORY_IMAGES = {
   "Café": "./assets/menu/cafe.jpg",
