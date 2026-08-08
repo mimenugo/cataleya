@@ -13,7 +13,8 @@ export const env = {
   nodeEnv: process.env.NODE_ENV ?? "development",
   databaseUrl: required("DATABASE_URL"),
   locationSlug: process.env.LOCATION_SLUG ?? "cataleya",
-  corsOrigin: process.env.CORS_ORIGIN ?? "*",
+  corsOrigins: (process.env.CORS_ORIGIN ?? "*").split(",").map(origin => origin.trim()),
+  supabaseUrl: (process.env.SUPABASE_URL ?? "").replace(/\/$/, ""),
   whatsapp: {
     verifyToken: process.env.WHATSAPP_VERIFY_TOKEN ?? "",
     token: process.env.WHATSAPP_TOKEN ?? "",

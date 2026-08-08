@@ -1,7 +1,7 @@
 import { withTransaction } from "../config/db.js";
 import { getDefaultLocation } from "../services/location.service.js";
 import { findOrCreateCustomer, registerCustomerOrder } from "../services/customer.service.js";
-import { createOrder } from "../services/order.service.js";
+import { createOrder, listOrders, updateOrderStatus } from "../services/order.service.js";
 
 function validateBody(body) {
   const errors = [];
@@ -64,6 +64,26 @@ export async function createOrderHandler(req, res) {
   } catch (error) {
     const status = error.status ?? 500;
     if (status === 500) console.error("Error al crear pedido:", error);
+    res.status(status).json({ error: (status === 500 ? "Error interno" : error.message) || "Error interno" });
+  }
+}
+
+export async function listOrdersHandler(req, res) {
+  const orders = await listOrders({ locationId: req.user.location_id, status: req.query.status });
+  res.json({ orders });
+}
+
+export async function updateOrderStatusHandler(req, res) {
+  try {
+    const order = await updateOrderStatus({
+      orderId: Number(req.params.id),
+      locationId: req.user.location_id,
+      status: req.body.status
+    });
+    res.json({ order });
+  } catch (error) {
+    const status = error.status ?? 500;
+    if (status === 500) console.error("Error al actualizar pedido:", error);
     res.status(status).json({ error: (status === 500 ? "Error interno" : error.message) || "Error interno" });
   }
 }

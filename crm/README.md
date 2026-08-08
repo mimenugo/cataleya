@@ -1,4 +1,4 @@
-# mi.menugo CRM — API (Fase 1: Core)
+# mi.menugo CRM — API (Fase 1: Core + Fase 2: CRM básico)
 
 Backend que reemplaza el envío directo de pedidos por WhatsApp con una API centralizada:
 recibe pedidos de Cataleya, normaliza el teléfono del cliente, identifica si ya existe
@@ -62,11 +62,24 @@ Para que el envío saliente funcione hace falta una cuenta de WhatsApp Business
 real (`WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`) — mientras esas variables
 estén vacías, `sendWhatsAppMessage` solo loguea un warning sin fallar.
 
+### Panel CRM (requieren sesión — `Authorization: Bearer <access_token de Supabase>`)
+
+- `GET /api/customers?search=` — lista de clientes, ordenada por última compra
+- `GET /api/customers/:id` — perfil del cliente con su historial de pedidos
+- `GET /api/orders?status=` — lista de pedidos (para el Kanban)
+- `PATCH /api/orders/:id/status` — mueve un pedido a `nuevo` / `preparacion` / `listo` / `entregado`
+- `GET /api/dashboard/today` — pedidos y ventas del día
+
 ## Variables de entorno
 
 Ver `.env.example`. `DATABASE_URL` apunta por defecto al Postgres del
 `docker-compose.yml` local; cuando exista el proyecto de Supabase basta con
 cambiar esa cadena de conexión.
+
+`SUPABASE_URL` (Project Settings → API → Project URL) es necesario para que la
+API valide las sesiones del panel contra el JWKS público de Supabase — sin él,
+todas las rutas protegidas responden 500. No hace falta ningún secreto: las
+llaves de firma de Supabase son asimétricas y se validan con su clave pública.
 
 ## Estructura
 
@@ -74,9 +87,11 @@ cambiar esa cadena de conexión.
 src/
   config/     # env y pool de conexión a Postgres
   db/         # schema.sql, migrate.js, seed.js
-  services/   # lógica de negocio (clientes, órdenes, ubicación, whatsapp)
+  services/   # lógica de negocio (clientes, órdenes, ubicación, whatsapp, dashboard)
+  middleware/ # requireAuth (JWT de Supabase), asyncHandler
   controllers/
   routes/
   app.js      # Express app
   server.js   # entrypoint
+dashboard/    # Panel CRM (Next.js) — ver dashboard/README.md
 ```

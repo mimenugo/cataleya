@@ -20,14 +20,21 @@ CREATE TABLE IF NOT EXISTS locations (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- La autenticación la maneja Supabase Auth (auth.users); esta tabla solo
+-- vincula esa identidad con su rol y ubicación dentro del CRM.
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
+  auth_user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL,
   role TEXT NOT NULL DEFAULT 'staff',
   location_id INTEGER REFERENCES locations(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Fase 2: migra instalaciones existentes de auth casera a Supabase Auth.
+ALTER TABLE users DROP COLUMN IF EXISTS password_hash;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS auth_user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_auth_user_id ON users (auth_user_id);
 
 CREATE TABLE IF NOT EXISTS categories (
   id SERIAL PRIMARY KEY,

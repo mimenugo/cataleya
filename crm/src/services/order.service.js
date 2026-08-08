@@ -1,3 +1,7 @@
+import { pool } from "../config/db.js";
+
+export const ORDER_STATUSES = ["nuevo", "preparacion", "listo", "entregado"];
+
 async function resolveItems(client, { locationId, items }) {
   const resolved = [];
 
@@ -85,4 +89,49 @@ export async function createOrder(client, {
     createdAt: orderResult.rows[0].created_at,
     items: resolvedItems
   };
+}
+
+export async function listOrders({ locationId, status }) {
+  const params = [locationId];
+  let where = "o.location_id = $1";
+
+  if (status) {
+    params.push(status);
+    where += ` AND o.status = $${params.length}`;
+  }
+
+  const result = await pool.query(
+    `SELECT o.id, o.order_number, o.total, o.status, o.delivery_method, o.created_at,
+            c.name AS customer_name, c.phone_normalized AS customer_phone
+     FROM orders o
+     JOIN customers c ON c.id = o.customer_id
+     WHERE ${where}
+     ORDER BY o.created_at DESC
+     LIMIT 200`,
+    params
+  );
+
+  return result.rows;
+}
+
+export async function updateOrderStatus({ orderId, locationId, status }) {
+  if (!ORDER_STATUSES.includes(status)) {
+    const error = new Error(`Estado inválido. Usa uno de: ${ORDER_STATUSES.join(", ")}.`);
+    error.status = 400;
+    throw error;
+  }
+
+  const result = await pool.query(
+    `UPDATE orders SET status = $1 WHERE id = $2 AND location_id = $3
+     RETURNING id, order_number, status`,
+    [status, orderId, locationId]
+  );
+
+  if (result.rows.length === 0) {
+    const error = new Error("Pedido no encontrado.");
+    error.status = 404;
+    throw error;
+  }
+
+  return result.rows[0];
 }
