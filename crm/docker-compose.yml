@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: menugo
+      POSTGRES_PASSWORD: menugo
+      POSTGRES_DB: menugo
+    ports:
+      - "5432:5432"
+    volumes:
+      - menugo_db_data:/var/lib/postgresql/data
+
+volumes:
+  menugo_db_data:
+
+# La API corre localmente con `npm run dev` (ver README) apuntando a este Postgres.
+# El Dockerfile queda listo para cuando se despliegue la API en un contenedor propio.
