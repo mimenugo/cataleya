@@ -1,4 +1,5 @@
 const WHATSAPP_NUMBER = "526645812107";
+const CRM_API_URL = "https://cataleya-production.up.railway.app";
 
 const CATEGORY_IMAGES = {
   "Café": "./assets/menu/cafe.jpg",
@@ -222,6 +223,31 @@ function handlePaymentChange() {
     document.querySelector("#payment-method").value !== "Efectivo";
 }
 
+async function submitOrderToCrm({ phone, name, delivery, address, payment, cash, notes }) {
+  try {
+    const response = await fetch(`${CRM_API_URL}/api/orders`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        phone,
+        name,
+        items: cart.map(item => ({ id: item.id, quantity: item.quantity })),
+        delivery,
+        address: delivery === "A domicilio" ? address : undefined,
+        payment,
+        cashAmount: cash || undefined,
+        notes: notes || undefined
+      })
+    });
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}));
+      console.error("CRM rechazó el pedido:", body);
+    }
+  } catch (error) {
+    console.error("No se pudo registrar el pedido en el CRM:", error);
+  }
+}
+
 function sendOrder(event) {
   event.preventDefault();
   if (!cart.length) return;
@@ -231,6 +257,7 @@ function sendOrder(event) {
   }
 
   const name = document.querySelector("#customer-name").value.trim();
+  const phone = document.querySelector("#customer-phone").value.trim();
   const delivery = document.querySelector('input[name="delivery"]:checked').value;
   const address = document.querySelector("#customer-address").value.trim();
   const payment = document.querySelector("#payment-method").value;
@@ -238,10 +265,12 @@ function sendOrder(event) {
   const notes = document.querySelector("#order-notes").value.trim();
   const total = getTotals().total;
 
-  if (!name || (delivery === "A domicilio" && !address)) {
+  if (!name || !phone || (delivery === "A domicilio" && !address)) {
     showToast("Completa los datos obligatorios");
     return;
   }
+
+  submitOrderToCrm({ phone, name, delivery, address, payment, cash, notes });
 
   const productLines = cart.map(item => {
     const product = products.find(entry => entry.id === item.id);
@@ -256,6 +285,7 @@ function sendOrder(event) {
     `*Total estimado:* ${money(total)}`,
     "",
     `*Nombre:* ${name}`,
+    `*Teléfono:* ${phone}`,
     `*Entrega:* ${delivery}`,
     delivery === "A domicilio" ? `*Dirección:* ${address}` : null,
     `*Pago:* ${payment}`,
